@@ -8,9 +8,9 @@ const products = [
   { id: '1', name: 'Bicicleta estática', price: 299.99, category: 'cardio', image: '/images/bicicleta estatica.webp', description: 'Bicicleta estática de bajo impacto para entrenamiento cardiovascular.' },
   { id: '2', name: 'Cinta de caminar', price: 499.99, category: 'cardio', image: '/images/Cinta de caminar.webp', description: 'Cinta de caminar con inclinación ajustable para simular caminatas al aire libre.' },
   { id: '3', name: 'Elíptica', price: 399.99, category: 'cardio', image: '/images/eliptica.webp', description: 'Máquina elíptica para entrenamiento de cuerpo completo sin impacto.' },
-  { id: '4', name: 'Remo', price: 349.99, category: 'cardio', image: 'url_imagen', description: 'Máquina de remo para fortalecer brazos, piernas y espalda.' },
-  { id: '5', name: 'Escalador', price: 279.99, category: 'cardio', image: 'url_imagen', description: 'Escalador para simular subir escaleras y mejorar la resistencia.' },
-  { id: '6', name: 'Bicicleta reclinada', price: 329.99, category: 'cardio', image: 'url_imagen', description: 'Bicicleta reclinada para mayor comodidad durante el ejercicio.' },
+  { id: '4', name: 'Remo', price: 349.99, category: 'cardio', image: 'images/Remo.webp', description: 'Máquina de remo para fortalecer brazos, piernas y espalda.' },
+  { id: '5', name: 'Escalador', price: 279.99, category: 'cardio', image: 'images/Escalador', description: 'Escalador para simular subir escaleras y mejorar la resistencia.' },
+  { id: '6', name: 'Bicicleta reclinada', price: 329.99, category: 'cardio', image: 'images/Bicicleta reclinada', description: 'Bicicleta reclinada para mayor comodidad durante el ejercicio.' },
 
   // Fuerza
   { id: '7', name: 'Mancuernas ajustables', price: 149.99, category: 'fuerza', image: 'url_imagen', description: 'Set de mancuernas ajustables para entrenamiento de fuerza variable.' },
@@ -38,16 +38,21 @@ export const getProducts = async () => {
 // Función para obtener productos por categoría
 export const getProductsByCategory = async (categoryId) => {
   await delay(500);
-  return products.filter(product => product.category === categoryId);
+  const filteredProducts = products.filter((product) => product.category === categoryId);
+  if (filteredProducts.length === 0) {
+    throw new Error(`Categoría "${categoryId}" no encontrada o sin productos.`);
+  }
+  return filteredProducts;
 };
 
 // Función para obtener un producto por ID
 export const getProductById = async (id) => {
   await delay(500);
-  const product = products.find(product => product.id === id);
+  const product = products.find((product) => product.id === id);
   if (!product) {
-    throw new Error('Producto no encontrado');
+    throw new Error(`Producto con ID "${id}" no encontrado.`);
   }
   return product;
 };
+
 

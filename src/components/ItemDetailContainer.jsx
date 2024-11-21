@@ -1,51 +1,70 @@
+// src/components/ItemDetailContainer.jsx
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
-import ItemList from './ItemList';
-import { getProducts, getProductsByCategory } from '../services/productService';
+import { useParams, useNavigate } from 'react-router-dom';
+import { getProductById } from '../services/productService';
 
-function ItemListContainer() {
-  const [products, setProducts] = useState([]);
+function ItemDetailContainer() {
+  const { itemId } = useParams();
+  const navigate = useNavigate();
+  const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
-  const { id } = useParams(); // 'id' será el parámetro de la categoría
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    const fetchProducts = async () => {
+    const fetchProduct = async () => {
       setLoading(true);
+      setError(null);
       try {
-        let result;
-        if (id) {
-          result = await getProductsByCategory(id); // Usamos el id para filtrar por categoría
-        } else {
-          result = await getProducts(); // Si no hay id, mostramos todos los productos
-        }
-        setProducts(result);
-      } catch (error) {
-        console.error("Error fetching products:", error);
-        // Aquí podrías establecer un estado de error si lo deseas
+        const fetchedProduct = await getProductById(itemId);
+        setProduct(fetchedProduct);
+      } catch (err) {
+        setError(`Error: Producto con ID "${itemId}" no encontrado.`);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchProducts();
-  }, [id]); // Dependencia en el id para recargar los productos al cambiar la categoría
+    fetchProduct();
+  }, [itemId]);
 
-  if (loading) {
-    return <div className="container mt-4">Cargando productos...</div>;
-  }
+  if (loading) return <div className="text-center">Cargando producto...</div>;
+  if (error) return <div className="alert alert-danger">{error}</div>;
 
   return (
     <div className="container mt-4">
-      <h2>{id ? `Productos de ${id}` : 'Todos los productos'}</h2>
-      {products.length > 0 ? (
-        <ItemList products={products} /> // Pasamos los productos a ItemList para que se muestren
-      ) : (
-        <p>No se encontraron productos.</p>
-      )}
+      <h2>Detalle del producto</h2>
+      <button
+        className="btn btn-secondary mb-3"
+        onClick={() => navigate(-1)} // Navega a la página anterior
+      >
+        &larr; Regresar
+      </button>
+      <div className="row">
+        <div className="col-md-6">
+          <img
+            src={product.image}
+            alt={product.name}
+            className="img-fluid"
+            onError={(e) => (e.target.src = '/fallback-image.jpg')}
+          />
+        </div>
+        <div className="col-md-6">
+          <h3>{product.name}</h3>
+          <p>{product.description}</p>
+          <p>
+            <strong>Precio:</strong> ${product.price}
+          </p>
+          <p>
+            <strong>Categoría:</strong> {product.category}
+          </p>
+        </div>
+      </div>
     </div>
   );
 }
 
-export default ItemListContainer;
+export default ItemDetailContainer;
+
+
 
 
